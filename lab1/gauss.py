@@ -32,7 +32,7 @@ def gauss_invert(A: np.array) -> np.array:                  #нахождени�
 
 def read_matrix(fname: str) -> np.array:                    #чтение матрицы из файла
     matrix = []
-    with open("/home/mora/matrix.txt", 'r') as file_mat:
+    with open("./matrix.txt", 'r') as file_mat:
         for line in file_mat.readlines():
             matrix.append(line.strip().split(" "))
     matrix = np.array(matrix, dtype = float)
