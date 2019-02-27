@@ -41,7 +41,7 @@ def read_matrix(fname: str) -> np.array:                    #чтение мат
 def norm(arr: np.array):                                    #нахождение нормы матриц
     return max([np.sum(abs(line)) for line in arr])
 
-mat = read_matrix("/home/mora/matrix.txt")
+mat = read_matrix("./matrix.txt")
 A = mat[:, :-1]
 b = mat[:, -1]
 if np.linalg.det(A) != 0:
