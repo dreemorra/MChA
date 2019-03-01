@@ -40,7 +40,7 @@ def jacobi_method(A: np.array, b: np.array) -> np.array:
     A = A.copy()
     b = b.copy()
     E = np.identity(len(A))
-    for i in range(0, len(A)):
+    for i in range(len(A)):
         b[i] /= A[i, i]
         A[i] /= A[i, i]
     B = E - A
@@ -48,7 +48,8 @@ def jacobi_method(A: np.array, b: np.array) -> np.array:
         x0 = np.array([1/2 for i in range(len(b))])
         x = apply_mat(B, x0) + b
         k = math.floor(math.log(0.01/(norm(x-x0))*(1-norm(B)), norm(B)))
-        for i in range(0, k+1):
+        print(f"Jacobi iterations: {k+1}")
+        for i in range(k+1):
             x = apply_mat(B, x) + b
         return x
 
@@ -57,15 +58,16 @@ def gauss_seidel_method(A: np.array, b: np.array) -> np.array:
     A = A.copy()
     b = b.copy()
     E = np.identity(len(A))
-    for i in range(0, len(A)):
+    for i in range(len(A)):
         b[i] /= A[i, i]
         A[i] /= A[i, i]
     B = E - A
     if np.sum([abs(B[i,i]) > np.sum(B[i]) - B[i,i] for i in range(len(A))]):
-        x0 = np.array([1/2 for i in range(len(b))])
+        x0 = b
         x = np.array(apply_mat(B, x0) + b)
         k = math.floor(math.log(0.01/(norm(x-x0))*(1-norm(B)), norm(B)))
-        for n in range(k-1):
+        print(f"Seidel iterations: {k+1}")
+        for i in range(k+1):
             for i in range(len(A)):
                 x[i] = np.sum(B[i, :i]*x[:i]) + np.sum(B[i, i+1:len(A)]*x0[i+1:len(A)]) + b[i]
             x0 = x

@@ -1,7 +1,8 @@
 import numpy as np
 np.set_printoptions(precision=3)
 
-def gauss_solve(A: np.array, b: np.array) -> np.array:      #решение матрицы методом Гаусса
+#решение системы методом Гаусса
+def gauss_solve(A: np.array, b: np.array) -> np.array:      
     A = A.copy()
     b = b.copy()
     for i in range(0, len(A)):                              #прямой ход
@@ -16,8 +17,8 @@ def gauss_solve(A: np.array, b: np.array) -> np.array:      #решение ма
             x[k] -= (A[k, m]*x[m])/A[k, k]
     return x
 
-
-def gauss_invert(A: np.array) -> np.array:                  #нахождение обратной матрицы методом Гаусса
+#нахождение обратной матрицы методом Гаусса
+def gauss_invert(A: np.array) -> np.array:                  
     A = A.copy()
     E = np.identity(len(A))                                 #единичная матрица
     for i in range(0, len(A)):                              #прямой и обратный ход
@@ -29,21 +30,23 @@ def gauss_invert(A: np.array) -> np.array:                  #нахождени�
                 A[j] -= A[i]*A[j, i]
     return E
 
-
-def read_matrix(fname: str) -> np.array:                    #чтение матрицы из файла
+#чтение матрицы из файла
+def read_matrix(fname: str) -> np.array:                    
     matrix = []
-    with open("./matrix.txt", 'r') as file_mat:
+    with open(fname, 'r') as file_mat:
         for line in file_mat.readlines():
             matrix.append(line.strip().split(" "))
     matrix = np.array(matrix, dtype = float)
     return matrix
 
-def norm(arr: np.array):                                    #нахождение нормы матриц
+#нахождение нормы матрицы
+def norm(arr: np.array):                                    
     return max([np.sum(abs(line)) for line in arr])
 
 mat = read_matrix("./matrix.txt")
 A = mat[:, :-1]
 b = mat[:, -1]
+
 if np.linalg.det(A) != 0:
     x = gauss_solve(A, b)
     inv_a = gauss_invert(A)
