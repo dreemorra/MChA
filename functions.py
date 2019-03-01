@@ -1,6 +1,5 @@
 import numpy as np
 import math
-np.set_printoptions(precision=3)
 
 #чтение матрицы из файла
 def read_matrix(fname: str) -> np.array:
@@ -175,17 +174,3 @@ def square_root_method(A: np.array, b: np.array, isInverse: bool = 0) -> np.arra
             s-=U[i, k]*x[k]
         x[i] = s/U[i,i]
     return x
-
-
-mat = read_matrix("./matrix.txt")
-A = mat[:, :-1]
-b = mat[:, -1]
-
-
-print(f"Matrix A:\n{A}\nb column:\n {b}")
-print(f"Gaussian elimination: {gaussian_elim(A, b)}")
-print(f"Jacobi iterative method: {jacobi_method(A, b)}")
-print(f"Gauss-Seidel iterative method: {gauss_seidel_method(A, b)}")
-print(f"Square root method: {square_root_method(A, b)}")
-print(f"Determinant: {determinant(A)}")
-print(f"Inversed matrix(Square root method): \n{square_invert(A)}")
