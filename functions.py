@@ -110,7 +110,7 @@ def jacobi_method(A: np.array, b: np.array) -> np.array:
         x0 = np.array([1/2 for i in range(len(b))])
         x = apply_mat(B, x0) + b
         k = math.floor(math.log(0.01/(norm(x-x0))*(1-norm(B)), norm(B)))
-        print(f"Jacobi iterations: {k}")
+        print(f"Jacobi iterations: {k+1}")
         for i in range(k+1):
             x = apply_mat(B, x) + b
         return x
@@ -142,8 +142,6 @@ def square_root_method(A: np.array, b: np.array, isInverse: bool = 0) -> np.arra
     if isInverse == 0:
         b = apply_mat(transp_mat(A), b)
     A = matrix_multiplication(transp_mat(A), A)   #симметризация
-    #print(f"Симметризированная A:\n{A}")
-    #print(f"Симметризированная b:\n{b}")
     U = np.zeros(A.shape)
 
     for i in range(len(A)):
@@ -174,3 +172,42 @@ def square_root_method(A: np.array, b: np.array, isInverse: bool = 0) -> np.arra
             s-=U[i, k]*x[k]
         x[i] = s/U[i,i]
     return x
+
+def max_elem(A: np.array):
+    max_num = 0.0
+    a = 0
+    b = 0
+    for i in range(len(A)):
+        for j in range(i+1, len(A)):
+            if math.fabs(A[i, j]) > max_num:
+                max_num = math.fabs(A[i, j])
+                a, b = i, j
+    return max_num, a, b
+
+def jacobi_eigenvalue(A: np.array):
+    A = A.copy()
+    UVectors = np.identity(len(A))
+    #симметризация
+    A = matrix_multiplication(transp_mat(A), A)
+
+    sumOfElements = 1
+    while sumOfElements > 0.001:
+        #макс. элемент
+        kek = max_elem(A)
+        #считается угол
+        f = math.atan(2*A[kek[1], kek[2]]/(A[kek[1], kek[1]] - A[kek[2], kek[2]])) / 2
+        #создается единичная матрица и матрица поворота
+        U = np.identity(len(A))
+        U[kek[1], kek[1]], U[kek[2], kek[2]] = math.cos(f), math.cos(f)
+        U[kek[2], kek[1]] = math.sin(f)
+        U[kek[1], kek[2]] = -1*math.sin(f)
+        UVectors = matrix_multiplication(UVectors, U)
+        #A(новая) = UT*A*U
+        A = transp_mat(U) @ A @ U
+        #проверка ??
+        sumOfElements = 0
+        for i in range(len(A)):
+            for j in range(len(A)):
+                if i != j:
+                    sumOfElements += A[i][j] ** 2
+    return np.array([A[i,i] for i in range(len(A))]), np.array(UVectors)
