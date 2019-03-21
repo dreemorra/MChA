@@ -54,7 +54,7 @@ def transp_mat(A: np.array) -> np.array:
                 A[i, j], A[j, i] = A[j, i], A[i, j]
     return A
 
-# определитель матрицы
+# определитель матрицы 
 def determinant(A: np.array) -> np.array:
     A = A.copy()
     A = matrix_multiplication(transp_mat(A), A)   #симметризация
@@ -102,15 +102,19 @@ def jacobi_method(A: np.array, b: np.array) -> np.array:
     A = A.copy()
     b = b.copy()
     E = np.identity(len(A))
+
+    #преобразуем к виду x = (E-A)x + b или x = Bx + b
     for i in range(len(A)):
         b[i] /= A[i, i]
         A[i] /= A[i, i]
     B = E - A
+
     if norm(B) < 1:
         x0 = np.array([1/2 for i in range(len(b))])
         x = apply_mat(B, x0) + b
         k = math.floor(math.log(0.01/(norm(x-x0))*(1-norm(B)), norm(B)))
         print(f"Jacobi iterations: {k+1}")
+        #x_k+1 = B*x_k + b
         for i in range(k+1):
             x = apply_mat(B, x) + b
         return x
@@ -120,36 +124,42 @@ def gauss_seidel_method(A: np.array, b: np.array) -> np.array:
     A = A.copy()
     b = b.copy()
     E = np.identity(len(A))
+    #преобразуем к виду x = (E-A)x + b или x = Bx + b
     for i in range(len(A)):
         b[i] /= A[i, i]
         A[i] /= A[i, i]
     B = E - A
+
     if np.sum([abs(B[i,i]) > np.sum(B[i]) - B[i,i] for i in range(len(A))]):
         x0 = b
         x = np.array(apply_mat(B, x0) + b)
         k = math.floor(math.log(0.01/(norm(x-x0))*(1-norm(B)), norm(B)))
         print(f"Seidel iterations: {k+1}")
-        for i in range(k+1):
+        while norm(x - x0) > 0.01:
+            x0 = x
+            #x[i]_k+1 = b[i] - sum(a[i,j]*x[j]_(k+1) from j = 1, j!=i to i-1) - sum(a[i,j]*x[j]_k from j = i+1 to n)
             for i in range(len(A)):
                 x[i] = np.sum(B[i, :i]*x[:i]) + np.sum(B[i, i+1:len(A)]*x0[i+1:len(A)]) + b[i]
-            x0 = x
         return x
 
 # решение системы методом квадратного корня
 def square_root_method(A: np.array, b: np.array, isInverse: bool = 0) -> np.array:
     A = A.copy()
     b = b.copy()
+    #симметризация
     if isInverse == 0:
         b = apply_mat(transp_mat(A), b)
-    A = matrix_multiplication(transp_mat(A), A)   #симметризация
+    A = matrix_multiplication(transp_mat(A), A)  
     U = np.zeros(A.shape)
 
     for i in range(len(A)):
+        #U[i,i] = sqrt(a[i,i] - sum(u[k, i]**2 for k from 1 to i-1))
         s = A[i,i]
         for k in range(i):
             s-= U[k, i]**2
         U[i, i] = math.sqrt(s)
 
+        #U[i, j] = (a[i,j] - sum(u[k,i]*u[k, j] for k from 1 to i-1), j = i+1, n) / u[i,i]
         for j in range(i+1, len(A)):
             s = A[i, j]
             for k in range(i):
@@ -159,13 +169,13 @@ def square_root_method(A: np.array, b: np.array, isInverse: bool = 0) -> np.arra
     y = np.zeros(b.shape)
     x = np.zeros(b.shape)
     Ut = transp_mat(U)
-
+    #решаем систему Ut*y = B
     for i in range(len(y)):
         s = b[i]
         for k in range(i):
             s-=Ut[i, k]*y[k]
         y[i] = s/Ut[i, i]
-
+    #решаем систему U*x = y
     for i in range(len(y)-1, -1, -1):
         s = y[i]
         for k in range(i+1, len(A)):
