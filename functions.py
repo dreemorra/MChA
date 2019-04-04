@@ -183,13 +183,14 @@ def square_root_method(A: np.array, b: np.array, isInverse: bool = 0) -> np.arra
         x[i] = s/U[i,i]
     return x
 
+# максимальный элемент в матрице А а[i0][j0], где i0 < j0
 def max_elem(A: np.array):
     max_num = 0.0
     a = 0
     b = 0
     for i in range(len(A)):
         for j in range(i+1, len(A)):
-            if math.fabs(A[i, j]) > max_num:
+            if math.fabs(A[i, j]) >= max_num:
                 max_num = math.fabs(A[i, j])
                 a, b = i, j
     return max_num, a, b
@@ -204,17 +205,18 @@ def jacobi_eigenvalue(A: np.array):
     while sumOfElements > 0.001:
         #макс. элемент
         kek = max_elem(A)
-        #считается угол
+        #считается угол f, такой, чтобы у матрицы (A(новая) = UT*A*U) a[i][j] обращался в нуль
         f = math.atan(2*A[kek[1], kek[2]]/(A[kek[1], kek[1]] - A[kek[2], kek[2]])) / 2
         #создается единичная матрица и матрица поворота
         U = np.identity(len(A))
         U[kek[1], kek[1]], U[kek[2], kek[2]] = math.cos(f), math.cos(f)
         U[kek[2], kek[1]] = math.sin(f)
         U[kek[1], kek[2]] = -1*math.sin(f)
+        #собственные векторы U = U[0]*U[1]*...*U[k-2]*U[k-1]
         UVectors = matrix_multiplication(UVectors, U)
         #A(новая) = UT*A*U
         A = transp_mat(U) @ A @ U
-        #проверка ??
+        #точность
         sumOfElements = 0
         for i in range(len(A)):
             for j in range(len(A)):
