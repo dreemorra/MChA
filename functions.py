@@ -1,8 +1,8 @@
 import numpy as np
 import math
 
-#чтение матрицы из файла
 def read_matrix(fname: str) -> np.array:
+    """Чтение матрицы из файла."""
     matrix = []
     with open(fname, 'r') as file_mat:
         for line in file_mat.readlines():
@@ -10,22 +10,23 @@ def read_matrix(fname: str) -> np.array:
     matrix = np.array(matrix, dtype=float)
     return matrix
 
-#умножение матриц
 def matrix_multiplication(m1: np.array, m2: np.array):
+    """Нахождение произведения матриц: m1*m2."""
     m1 = m1.copy()
     m2 = m2.copy()
     return np.array([[sum(a*b for a,b in zip(X_row, Y_col)) for Y_col in zip(*m2)] for X_row in m1])
 
-# нахождение нормы матрицы
 def norm(arr: np.array):
+    """Нахождение нормы матрицы."""
     return max([np.sum(abs(line)) for line in arr])
 
-# умножение матрицы и вектора
 def apply_mat(A: np.array, x: np.array):
+    """Перемножение матрицы и вектора."""
     return np.array([np.sum(x*A[i]) for i in range(len(A))])
 
-# нахождение обратной матрицы методом Гаусса
 def gauss_invert(A: np.array) -> np.array:
+    """Вычисление обратной матрицы методом Гаусса."""
+
     A = A.copy()
     E = np.identity(len(A))                                 #единичная матрица
     for i in range(len(A)):                              #прямой и обратный ход
@@ -37,8 +38,9 @@ def gauss_invert(A: np.array) -> np.array:
                 A[j] -= A[i]*A[j, i]
     return E
 
-#обратная матрица методом квадратного корня
 def square_invert(A: np.array) -> np.array:
+    """Вычисление обратной матрицы методом квадратного корня."""
+
     A = A.copy()
     E = np.identity(len(A))
     inv_A = np.zeros(A.shape)
@@ -46,16 +48,16 @@ def square_invert(A: np.array) -> np.array:
         inv_A[i] = square_root_method(A, E[i], True)
     return inv_A
 
-# транспонирование матрицы
 def transp_mat(A: np.array) -> np.array:
+    """Транспонирование матрицы А."""
     A = A.copy()
     for i in range(len(A)):
         for j in range(i+1, len(A)):
                 A[i, j], A[j, i] = A[j, i], A[i, j]
     return A
 
-# определитель матрицы 
 def determinant(A: np.array) -> np.array:
+    """Вычисление определителя симмметризированной матрицы"""
     A = A.copy()
     A = matrix_multiplication(transp_mat(A), A)   #симметризация
     U = np.zeros(A.shape)
@@ -81,8 +83,8 @@ def determinant(A: np.array) -> np.array:
         det *= U[i][i] ** 2
     return det
 
-# решение системы методом Гаусса
 def gaussian_elim(A: np.array, b: np.array) -> np.array:
+    """Решение системы методом Гаусса."""
     A = A.copy()
     b = b.copy()
     for i in range(len(A)):  # прямой ход
@@ -97,8 +99,9 @@ def gaussian_elim(A: np.array, b: np.array) -> np.array:
             x[k] -= (A[k, m]*x[m])/A[k, k]
     return x
 
-# решение системы методом простых итераций(метод Якоби)
 def jacobi_method(A: np.array, b: np.array) -> np.array:
+    """Решение системы методом простых итераций(метод Якоби)"""
+
     A = A.copy()
     b = b.copy()
     E = np.identity(len(A))
@@ -119,8 +122,8 @@ def jacobi_method(A: np.array, b: np.array) -> np.array:
             x = apply_mat(B, x) + b
         return x
 
-# решение системы методом Гаусса-Зейделя
 def gauss_seidel_method(A: np.array, b: np.array) -> np.array:
+    """Решение системы методом Гаусса-Зейделя."""
     A = A.copy()
     b = b.copy()
     E = np.identity(len(A))
@@ -142,8 +145,8 @@ def gauss_seidel_method(A: np.array, b: np.array) -> np.array:
                 x[i] = np.sum(B[i, :i]*x[:i]) + np.sum(B[i, i+1:len(A)]*x0[i+1:len(A)]) + b[i]
         return x
 
-# решение системы методом квадратного корня
 def square_root_method(A: np.array, b: np.array, isInverse: bool = 0) -> np.array:
+    """Решение системы методом квадратного корня."""
     A = A.copy()
     b = b.copy()
     #симметризация
@@ -183,8 +186,8 @@ def square_root_method(A: np.array, b: np.array, isInverse: bool = 0) -> np.arra
         x[i] = s/U[i,i]
     return x
 
-# максимальный элемент в матрице А а[i0][j0], где i0 < j0
 def max_elem(A: np.array):
+    """Поиск максимального элемента в матрице А а[i0][j0], где i0 < j0"""
     max_num = 0.0
     a = 0
     b = 0
@@ -196,6 +199,7 @@ def max_elem(A: np.array):
     return max_num, a, b
 
 def jacobi_eigenvalue(A: np.array):
+    """Вычисление собственных значений матрицы."""
     A = A.copy()
     UVectors = np.identity(len(A))
     #симметризация
